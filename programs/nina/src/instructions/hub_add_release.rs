@@ -8,8 +8,9 @@ use crate::errors::ErrorCode;
 pub struct HubAddRelease<'info> {
     #[account(mut)]
     pub payer: Signer<'info>,
-    #[account(mut)]
-    pub authority: Signer<'info>,
+    /// CHECK: This is safe because we check in the handler that authority === payer 
+    /// or that payer is nina operated file-service wallet
+    pub authority: UncheckedAccount<'info>,
     #[account(
         seeds = [b"nina-hub".as_ref(), hub_handle.as_bytes()],
         bump,
@@ -19,7 +20,7 @@ pub struct HubAddRelease<'info> {
         init,
         seeds = [b"nina-hub-release".as_ref(), hub.key().as_ref(), release.key().as_ref()],
         bump,
-        payer = authority,
+        payer = payer,
         space  = 120
     )]
     pub hub_release: Box<Account<'info, HubRelease>>,
@@ -27,7 +28,7 @@ pub struct HubAddRelease<'info> {
         init,
         seeds = [b"nina-hub-content".as_ref(), hub.key().as_ref(), release.key().as_ref()],
         bump,
-        payer = authority,
+        payer = payer,
         space = 153
     )]
     pub hub_content: Box<Account<'info, HubContent>>,

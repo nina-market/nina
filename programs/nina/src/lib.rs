@@ -1,6 +1,6 @@
 use anchor_lang::prelude::*;
 
-declare_id!("77BKtqWTbTRxj5eZPuFbeXjx3qz4TTHoXRnpCejYWiQH");
+declare_id!("ninaN2tm9vUkxoanvGcNApEeWiidLMM2TdBX8HoJuL4");
 
 pub mod state;
 pub mod instructions;
@@ -102,38 +102,6 @@ pub mod nina {
         amount: u64,
     ) -> Result<()> {
         instructions::release_open_to_limited_edition::handler(ctx, amount)
-    }
-
-    pub fn redeemable_init(
-        ctx: Context<RedeemableInitialize>,
-        config: RedeemableConfig,
-        bumps: RedeemableBumps,
-    ) -> Result<()> {
-        instructions::redeemable_init::handler(ctx, config, bumps)
-    }
-
-    pub fn redeemable_update_config(
-        ctx: Context<RedeemableUpdateConfig>,
-        config: RedeemableConfig,
-    ) -> Result<()> {
-        instructions::redeemable_update_config::handler(ctx, config)
-    }
-
-    pub fn redeemable_redeem(
-        ctx: Context<RedeemableRedeem>,
-        encryption_public_key: Vec<u8>,
-        address: Vec<u8>,
-        iv: Vec<u8>,
-    ) -> Result<()> {
-        instructions::redeemable_redeem::handler(ctx, encryption_public_key, address, iv)
-    }
-
-    pub fn redeemable_shipping_update(
-        ctx: Context<RedeemableShippingUpdate>,
-        shipper: Vec<u8>,
-        tracking_number: Vec<u8>,
-    ) -> Result<()> {
-        instructions::redeemable_shipping_update::handler(ctx, shipper, tracking_number)
     }
 
     pub fn exchange_init(

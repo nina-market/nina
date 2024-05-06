@@ -1,9 +1,9 @@
 // TODO: use the `@solana/spl-token` package instead of utils here.
 
 const anchor = require("@project-serum/anchor");
-const serumCmn = require("@project-serum/common");
 const TokenInstructions = require("@project-serum/serum").TokenInstructions;
 const { getMinimumBalanceForRentExemptAccount, createInitializeAccountInstruction, TOKEN_PROGRAM_ID } = require("@solana/spl-token");
+const { getAccount } =  require("@solana/spl-token");
 
 const WRAPPED_SOL_MINT_PUBLIC_KEY = new anchor.web3.PublicKey(
   'So11111111111111111111111111111111111111112'
@@ -19,7 +19,9 @@ function sleep(ms) {
 }
 
 async function getTokenAccount(provider, addr) {
-  return await serumCmn.getTokenAccount(provider, addr);
+  const tokenAccount = await getAccount(provider.connection, addr);
+  tokenAccount.amount = new anchor.BN(Number(tokenAccount.amount));
+  return tokenAccount
 }
 
 const bnToDecimal = (amount) => {

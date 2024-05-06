@@ -670,6 +670,7 @@ describe('Release', async () => {
       provider,
       user1UsdcTokenAccount,
     );
+    console.log('usdcTokenAccountBefore', usdcTokenAccountBefore.amount)
     const usdcTokenAccountBeforeBalanceTx = usdcTokenAccountBefore.amount.toNumber();
 
     let [_receiverReleaseTokenAccount, receiverReleaseTokenAccountIx] = await findOrCreateAssociatedTokenAccount(
@@ -3487,330 +3488,330 @@ describe("Exchange", async () => {
   });
 });
 
-describe('Redeemable', async () => {
-  let redeemable = null;
-  let redeemableSigner = null;
-  let redeemableNonce = null;
-  let redeemedMint = null;
-  let publisherEncryptionPublicKey = null
-  let publisherKeys = null;
+// describe('Redeemable', async () => {
+//   let redeemable = null;
+//   let redeemableSigner = null;
+//   let redeemableNonce = null;
+//   let redeemedMint = null;
+//   let publisherEncryptionPublicKey = null
+//   let publisherKeys = null;
 
-  it('Initializes a redeemable', async () => {
-    [publisherEncryptionPublicKey, publisherKeys] = await encrypt.exportPublicKey();
-    const encryptionPublicKeyBuffer = new Buffer.from(publisherEncryptionPublicKey)
-    const description = "1x LP album"
-    redeemedMint = anchor.web3.Keypair.generate();
+//   it('Initializes a redeemable', async () => {
+//     [publisherEncryptionPublicKey, publisherKeys] = await encrypt.exportPublicKey();
+//     const encryptionPublicKeyBuffer = new Buffer.from(publisherEncryptionPublicKey)
+//     const description = "1x LP album"
+//     redeemedMint = anchor.web3.Keypair.generate();
 
-    const [_redeemable, redeemableBump] = await anchor.web3.PublicKey.findProgramAddress(
-      [Buffer.from(anchor.utils.bytes.utf8.encode("nina-redeemable")), release.toBuffer(), redeemedMint.publicKey.toBuffer()],
-      nina.programId
-    );    
-    redeemable = _redeemable
-    const [_redeemableSigner, redeemableSignerBump] = await anchor.web3.PublicKey.findProgramAddress(
-      [Buffer.from(anchor.utils.bytes.utf8.encode("nina-redeemable-signer")), redeemable.toBuffer()],
-      nina.programId
-    );    
-    redeemableSigner = _redeemableSigner;
+//     const [_redeemable, redeemableBump] = await anchor.web3.PublicKey.findProgramAddress(
+//       [Buffer.from(anchor.utils.bytes.utf8.encode("nina-redeemable")), release.toBuffer(), redeemedMint.publicKey.toBuffer()],
+//       nina.programId
+//     );    
+//     redeemable = _redeemable
+//     const [_redeemableSigner, redeemableSignerBump] = await anchor.web3.PublicKey.findProgramAddress(
+//       [Buffer.from(anchor.utils.bytes.utf8.encode("nina-redeemable-signer")), redeemable.toBuffer()],
+//       nina.programId
+//     );    
+//     redeemableSigner = _redeemableSigner;
 
-    const redeemedMintIx = await createMintInstructions(
-      provider,
-      provider.wallet.publicKey,
-      redeemedMint.publicKey,
-      0,
-    );
+//     const redeemedMintIx = await createMintInstructions(
+//       provider,
+//       provider.wallet.publicKey,
+//       redeemedMint.publicKey,
+//       0,
+//     );
 
-    const bumps = {
-      redeemable: redeemableBump,
-      signer: redeemableSignerBump,
-    };
+//     const bumps = {
+//       redeemable: redeemableBump,
+//       signer: redeemableSignerBump,
+//     };
 
-    const config = {
-      encryptionPublicKey: encryptionPublicKeyBuffer,
-      description,
-      redeemedMax: new anchor.BN(3),
-    };
+//     const config = {
+//       encryptionPublicKey: encryptionPublicKeyBuffer,
+//       description,
+//       redeemedMax: new anchor.BN(3),
+//     };
 
-    await nina.rpc.redeemableInit(
-      config,
-      bumps, {
-        accounts: {
-          authority: provider.wallet.publicKey,
-          release,
-          redeemable,
-          redeemableSigner,
-          redeemableMint: releaseMint.publicKey,
-          redeemedMint: redeemedMint.publicKey,
-          rent: anchor.web3.SYSVAR_RENT_PUBKEY,
-          systemProgram: anchor.web3.SystemProgram.programId,
-          tokenProgram: TOKEN_PROGRAM_ID,
-        },
-        signers: [redeemedMint],
-        instructions: [
-          ...redeemedMintIx,
-        ]
-      }
-    )
+//     await nina.rpc.redeemableInit(
+//       config,
+//       bumps, {
+//         accounts: {
+//           authority: provider.wallet.publicKey,
+//           release,
+//           redeemable,
+//           redeemableSigner,
+//           redeemableMint: releaseMint.publicKey,
+//           redeemedMint: redeemedMint.publicKey,
+//           rent: anchor.web3.SYSVAR_RENT_PUBKEY,
+//           systemProgram: anchor.web3.SystemProgram.programId,
+//           tokenProgram: TOKEN_PROGRAM_ID,
+//         },
+//         signers: [redeemedMint],
+//         instructions: [
+//           ...redeemedMintIx,
+//         ]
+//       }
+//     )
 
-    const redeemableAfter = await nina.account.redeemable.fetch(redeemable);
-    let encryptionPublicKeyAfter = Buffer.from(redeemableAfter.encryptionPublicKey);
-    encryptionPublicKeyAfter = encryptionPublicKeyAfter.buffer.slice(
-      encryptionPublicKeyAfter.byteOffset,
-      encryptionPublicKeyAfter.byteOffset + encryptionPublicKeyAfter.byteLength
-    );
-    assert.ok(redeemableAfter.redeemedCount.toNumber() === 0)
-    assert.ok(redeemableAfter.redeemedMax.toNumber() === 3)
-    assert.ok(encrypt.decode(redeemableAfter.description) === description)
-    assert.deepEqual(encryptionPublicKeyAfter, publisherEncryptionPublicKey)
-  });
+//     const redeemableAfter = await nina.account.redeemable.fetch(redeemable);
+//     let encryptionPublicKeyAfter = Buffer.from(redeemableAfter.encryptionPublicKey);
+//     encryptionPublicKeyAfter = encryptionPublicKeyAfter.buffer.slice(
+//       encryptionPublicKeyAfter.byteOffset,
+//       encryptionPublicKeyAfter.byteOffset + encryptionPublicKeyAfter.byteLength
+//     );
+//     assert.ok(redeemableAfter.redeemedCount.toNumber() === 0)
+//     assert.ok(redeemableAfter.redeemedMax.toNumber() === 3)
+//     assert.ok(encrypt.decode(redeemableAfter.description) === description)
+//     assert.deepEqual(encryptionPublicKeyAfter, publisherEncryptionPublicKey)
+//   });
 
-  const redemptionRecord = anchor.web3.Keypair.generate();
-  let redeemerEncryptionPublicKey = null;
-  let redeemerKeys = null;
-  let iv = null;
+//   const redemptionRecord = anchor.web3.Keypair.generate();
+//   let redeemerEncryptionPublicKey = null;
+//   let redeemerKeys = null;
+//   let iv = null;
   
-  it('Redeems a redeemable', async () => {
-    [redeemerEncryptionPublicKey, redeemerKeys] = await encrypt.exportPublicKey();
-    const redeemerEncryptionPublicKeyBuffer = new Buffer.from(redeemerEncryptionPublicKey)
+//   it('Redeems a redeemable', async () => {
+//     [redeemerEncryptionPublicKey, redeemerKeys] = await encrypt.exportPublicKey();
+//     const redeemerEncryptionPublicKeyBuffer = new Buffer.from(redeemerEncryptionPublicKey)
 
-    let [redeemedTokenAccount, redeemedTokenAccountIx] = await findOrCreateAssociatedTokenAccount(
-      provider,
-      user1.publicKey,
-      anchor.web3.SystemProgram.programId,
-      anchor.web3.SYSVAR_RENT_PUBKEY,
-      redeemedMint.publicKey,
-    );
+//     let [redeemedTokenAccount, redeemedTokenAccountIx] = await findOrCreateAssociatedTokenAccount(
+//       provider,
+//       user1.publicKey,
+//       anchor.web3.SystemProgram.programId,
+//       anchor.web3.SYSVAR_RENT_PUBKEY,
+//       redeemedMint.publicKey,
+//     );
 
-    const redemptionRecordIx = await nina.account.redemptionRecord.createInstruction(redemptionRecord);
+//     const redemptionRecordIx = await nina.account.redemptionRecord.createInstruction(redemptionRecord);
     
-    const addressObject = {
-      name: 'John Smith',
-      addressLine1: '123 Main St',
-      addressLine2: "Apt 1",
-      city: "New York",
-      state: "NY",
-      postalCode: "10002",
-      country: "USA",
-    }
+//     const addressObject = {
+//       name: 'John Smith',
+//       addressLine1: '123 Main St',
+//       addressLine2: "Apt 1",
+//       city: "New York",
+//       state: "NY",
+//       postalCode: "10002",
+//       country: "USA",
+//     }
 
-    const addressString = Object.values(addressObject).join(",")
+//     const addressString = Object.values(addressObject).join(",")
 
-    const [encryptedData, _iv] = await encrypt.encryptData(addressString, publisherEncryptionPublicKey, redeemerKeys, 272)
-    iv = _iv;
-    await nina.rpc.redeemableRedeem(
-      redeemerEncryptionPublicKeyBuffer,
-      encryptedData,
-      iv, {
-        accounts: {
-          redeemer: user1.publicKey,
-          redeemableMint: releaseMint.publicKey,
-          redeemedMint: redeemedMint.publicKey,
-          redeemable,
-          redeemableSigner,
-          release,
-          redemptionRecord: redemptionRecord.publicKey,
-          redeemerRedeemableTokenAccount: receiverReleaseTokenAccount,
-          redeemerRedeemedTokenAccount: redeemedTokenAccount,
-          tokenProgram: TOKEN_PROGRAM_ID,
-          rent: anchor.web3.SYSVAR_RENT_PUBKEY,
-          systemProgram: anchor.web3.SystemProgram.programId,
-        },
-        signers: [user1, redemptionRecord],
-        instructions: [
-          redeemedTokenAccountIx,
-          redemptionRecordIx,
-        ],
-      }
-    );
+//     const [encryptedData, _iv] = await encrypt.encryptData(addressString, publisherEncryptionPublicKey, redeemerKeys, 272)
+//     iv = _iv;
+//     await nina.rpc.redeemableRedeem(
+//       redeemerEncryptionPublicKeyBuffer,
+//       encryptedData,
+//       iv, {
+//         accounts: {
+//           redeemer: user1.publicKey,
+//           redeemableMint: releaseMint.publicKey,
+//           redeemedMint: redeemedMint.publicKey,
+//           redeemable,
+//           redeemableSigner,
+//           release,
+//           redemptionRecord: redemptionRecord.publicKey,
+//           redeemerRedeemableTokenAccount: receiverReleaseTokenAccount,
+//           redeemerRedeemedTokenAccount: redeemedTokenAccount,
+//           tokenProgram: TOKEN_PROGRAM_ID,
+//           rent: anchor.web3.SYSVAR_RENT_PUBKEY,
+//           systemProgram: anchor.web3.SystemProgram.programId,
+//         },
+//         signers: [user1, redemptionRecord],
+//         instructions: [
+//           redeemedTokenAccountIx,
+//           redemptionRecordIx,
+//         ],
+//       }
+//     );
 
-    const redeemableAfter = await nina.account.redeemable.fetch(redeemable);
-    assert.ok(redeemableAfter.redeemedCount.toNumber() === 1);
+//     const redeemableAfter = await nina.account.redeemable.fetch(redeemable);
+//     assert.ok(redeemableAfter.redeemedCount.toNumber() === 1);
 
-    const redemptionRecordAfter = await nina.account.redemptionRecord.fetch(redemptionRecord.publicKey);
-    let encryptionPublicKeyAfter = Buffer.from(redemptionRecordAfter.encryptionPublicKey);
-    encryptionPublicKeyAfter = encryptionPublicKeyAfter.buffer.slice(
-      encryptionPublicKeyAfter.byteOffset,
-      encryptionPublicKeyAfter.byteOffset + encryptionPublicKeyAfter.byteLength
-    )
-    assert.deepEqual(encryptionPublicKeyAfter, redeemerEncryptionPublicKey)
+//     const redemptionRecordAfter = await nina.account.redemptionRecord.fetch(redemptionRecord.publicKey);
+//     let encryptionPublicKeyAfter = Buffer.from(redemptionRecordAfter.encryptionPublicKey);
+//     encryptionPublicKeyAfter = encryptionPublicKeyAfter.buffer.slice(
+//       encryptionPublicKeyAfter.byteOffset,
+//       encryptionPublicKeyAfter.byteOffset + encryptionPublicKeyAfter.byteLength
+//     )
+//     assert.deepEqual(encryptionPublicKeyAfter, redeemerEncryptionPublicKey)
 
-    const address = await encrypt.decryptData(redemptionRecordAfter.address, redeemerEncryptionPublicKey, iv, publisherKeys);
-    assert.ok(address === addressString);
+//     const address = await encrypt.decryptData(redemptionRecordAfter.address, redeemerEncryptionPublicKey, iv, publisherKeys);
+//     assert.ok(address === addressString);
 
-    const receiverReleaseTokenAccountAfter = await getTokenAccount(
-      provider,
-      receiverReleaseTokenAccount,
-    );
-    assert.ok(receiverReleaseTokenAccountAfter.amount.toNumber() === 0);
+//     const receiverReleaseTokenAccountAfter = await getTokenAccount(
+//       provider,
+//       receiverReleaseTokenAccount,
+//     );
+//     assert.ok(receiverReleaseTokenAccountAfter.amount.toNumber() === 0);
 
-    const redeemedTokenAccountAfter = await getTokenAccount(
-      provider,
-      redeemedTokenAccount,
-    );
-    assert.ok(redeemedTokenAccountAfter.amount.toNumber() === 1);
-  });
+//     const redeemedTokenAccountAfter = await getTokenAccount(
+//       provider,
+//       redeemedTokenAccount,
+//     );
+//     assert.ok(redeemedTokenAccountAfter.amount.toNumber() === 1);
+//   });
 
-  it('Should let Redeemable Authority update tracking information for redemption record', async () => {
-    const shipper = "USPS";
-    const trackingNumber = "12345678900987654567890";
+//   it('Should let Redeemable Authority update tracking information for redemption record', async () => {
+//     const shipper = "USPS";
+//     const trackingNumber = "12345678900987654567890";
 
-    const [encryptedShipper] = await encrypt.encryptData(shipper, redeemerEncryptionPublicKey, publisherKeys, 32, iv)
-    const [encryptedTrackingNumber] = await encrypt.encryptData(trackingNumber, redeemerEncryptionPublicKey, publisherKeys, 64, iv)
+//     const [encryptedShipper] = await encrypt.encryptData(shipper, redeemerEncryptionPublicKey, publisherKeys, 32, iv)
+//     const [encryptedTrackingNumber] = await encrypt.encryptData(trackingNumber, redeemerEncryptionPublicKey, publisherKeys, 64, iv)
 
-    await nina.rpc.redeemableShippingUpdate(
-      encryptedShipper,
-      encryptedTrackingNumber, {
-        accounts: {
-          authority: provider.wallet.publicKey,
-          redeemable: redeemable,
-          redemptionRecord: redemptionRecord.publicKey,
-        }
-      }
-    );
+//     await nina.rpc.redeemableShippingUpdate(
+//       encryptedShipper,
+//       encryptedTrackingNumber, {
+//         accounts: {
+//           authority: provider.wallet.publicKey,
+//           redeemable: redeemable,
+//           redemptionRecord: redemptionRecord.publicKey,
+//         }
+//       }
+//     );
 
-    const redemptionRecordLookup = await nina.account.redemptionRecord.fetch(redemptionRecord.publicKey);
-    const decryptedShipper = await encrypt.decryptData(redemptionRecordLookup.shipper, publisherEncryptionPublicKey, iv, redeemerKeys)
-    const decryptedTrackingNumber = await encrypt.decryptData(redemptionRecordLookup.trackingNumber, publisherEncryptionPublicKey, iv, redeemerKeys)
-    assert.ok(decryptedShipper === shipper);
-    assert.ok(decryptedTrackingNumber === trackingNumber);
-  });
+//     const redemptionRecordLookup = await nina.account.redemptionRecord.fetch(redemptionRecord.publicKey);
+//     const decryptedShipper = await encrypt.decryptData(redemptionRecordLookup.shipper, publisherEncryptionPublicKey, iv, redeemerKeys)
+//     const decryptedTrackingNumber = await encrypt.decryptData(redemptionRecordLookup.trackingNumber, publisherEncryptionPublicKey, iv, redeemerKeys)
+//     assert.ok(decryptedShipper === shipper);
+//     assert.ok(decryptedTrackingNumber === trackingNumber);
+//   });
 
-it('Fails when redeeming more redeemables than available', async () => {
-    [redeemerEncryptionPublicKey, redeemerKeys] = await encrypt.exportPublicKey();
-    const redeemerEncryptionPublicKeyBuffer = new Buffer.from(redeemerEncryptionPublicKey)
+// it('Fails when redeeming more redeemables than available', async () => {
+//     [redeemerEncryptionPublicKey, redeemerKeys] = await encrypt.exportPublicKey();
+//     const redeemerEncryptionPublicKeyBuffer = new Buffer.from(redeemerEncryptionPublicKey)
 
-    let [redeemedTokenAccount, redeemedTokenAccountIx] = await findOrCreateAssociatedTokenAccount(
-      provider,
-      user1.publicKey,
-      anchor.web3.SystemProgram.programId,
-      anchor.web3.SYSVAR_RENT_PUBKEY,
-      redeemedMint.publicKey,
-    );
+//     let [redeemedTokenAccount, redeemedTokenAccountIx] = await findOrCreateAssociatedTokenAccount(
+//       provider,
+//       user1.publicKey,
+//       anchor.web3.SystemProgram.programId,
+//       anchor.web3.SYSVAR_RENT_PUBKEY,
+//       redeemedMint.publicKey,
+//     );
     
-    const addressObject = {
-      name: 'John Smith',
-      addressLine1: '123 Main St',
-      addressLine2: "Apt 1",
-      city: "New York",
-      state: "NY",
-      postalCode: "10002",
-      country: "USA",
-    }
+//     const addressObject = {
+//       name: 'John Smith',
+//       addressLine1: '123 Main St',
+//       addressLine2: "Apt 1",
+//       city: "New York",
+//       state: "NY",
+//       postalCode: "10002",
+//       country: "USA",
+//     }
 
-    const addressString = Object.values(addressObject).join(",")
+//     const addressString = Object.values(addressObject).join(",")
 
-    const [encryptedData, _iv] = await encrypt.encryptData(addressString, publisherEncryptionPublicKey, redeemerKeys, 272)
-    iv = _iv;
+//     const [encryptedData, _iv] = await encrypt.encryptData(addressString, publisherEncryptionPublicKey, redeemerKeys, 272)
+//     iv = _iv;
 
-    const createGenerator = function*() {
-      let i = 0;
-      while(i < 5) {
-        yield await Promise.resolve(i++);
-      }
-    }
-    const generator = createGenerator();
+//     const createGenerator = function*() {
+//       let i = 0;
+//       while(i < 5) {
+//         yield await Promise.resolve(i++);
+//       }
+//     }
+//     const generator = createGenerator();
 
-    await assert.rejects(
-      async () => {
-        for await (let item of generator) {
-          await nina.rpc.releasePurchase(
-            new anchor.BN(releasePrice), {
-              accounts: {
-                release,
-                releaseSigner,
-                payer: user1.publicKey,
-                payerTokenAccount: user1UsdcTokenAccount,
-                receiver: user1.publicKey,
-                receiverReleaseTokenAccount: receiverReleaseTokenAccount,
-                royaltyTokenAccount,
-                releaseMint: releaseMint.publicKey,
-                tokenProgram: TOKEN_PROGRAM_ID,
-              },
-              signers: [user1],
-            }
-          );
+//     await assert.rejects(
+//       async () => {
+//         for await (let item of generator) {
+//           await nina.rpc.releasePurchase(
+//             new anchor.BN(releasePrice), {
+//               accounts: {
+//                 release,
+//                 releaseSigner,
+//                 payer: user1.publicKey,
+//                 payerTokenAccount: user1UsdcTokenAccount,
+//                 receiver: user1.publicKey,
+//                 receiverReleaseTokenAccount: receiverReleaseTokenAccount,
+//                 royaltyTokenAccount,
+//                 releaseMint: releaseMint.publicKey,
+//                 tokenProgram: TOKEN_PROGRAM_ID,
+//               },
+//               signers: [user1],
+//             }
+//           );
 
-          const redemptionRecord = anchor.web3.Keypair.generate();
-          const redemptionRecordIx = await nina.account.redemptionRecord.createInstruction(redemptionRecord);
-          await nina.rpc.redeemableRedeem(
-            redeemerEncryptionPublicKeyBuffer,
-            encryptedData,
-            iv, {
-              accounts: {
-                redeemer: user1.publicKey,
-                redeemableMint: releaseMint.publicKey,
-                redeemedMint: redeemedMint.publicKey,
-                redeemable,
-                redeemableSigner,
-                release,
-                redemptionRecord: redemptionRecord.publicKey,
-                redeemerRedeemableTokenAccount: receiverReleaseTokenAccount,
-                redeemerRedeemedTokenAccount: redeemedTokenAccount,
-                tokenProgram: TOKEN_PROGRAM_ID,
-                rent: anchor.web3.SYSVAR_RENT_PUBKEY,
-                systemProgram: anchor.web3.SystemProgram.programId,
-              },
-              signers: [user1, redemptionRecord],
-              instructions: [
-                redemptionRecordIx,
-              ],
-            }
-          );
-        }
-      },
-      (err) => {
-        assert.equal(err.error.errorCode.number, 6010);
-        assert.equal(err.error.errorMessage, "No more redeemables available");
-        return true;
-      }
-    );
-  });
+//           const redemptionRecord = anchor.web3.Keypair.generate();
+//           const redemptionRecordIx = await nina.account.redemptionRecord.createInstruction(redemptionRecord);
+//           await nina.rpc.redeemableRedeem(
+//             redeemerEncryptionPublicKeyBuffer,
+//             encryptedData,
+//             iv, {
+//               accounts: {
+//                 redeemer: user1.publicKey,
+//                 redeemableMint: releaseMint.publicKey,
+//                 redeemedMint: redeemedMint.publicKey,
+//                 redeemable,
+//                 redeemableSigner,
+//                 release,
+//                 redemptionRecord: redemptionRecord.publicKey,
+//                 redeemerRedeemableTokenAccount: receiverReleaseTokenAccount,
+//                 redeemerRedeemedTokenAccount: redeemedTokenAccount,
+//                 tokenProgram: TOKEN_PROGRAM_ID,
+//                 rent: anchor.web3.SYSVAR_RENT_PUBKEY,
+//                 systemProgram: anchor.web3.SystemProgram.programId,
+//               },
+//               signers: [user1, redemptionRecord],
+//               instructions: [
+//                 redemptionRecordIx,
+//               ],
+//             }
+//           );
+//         }
+//       },
+//       (err) => {
+//         assert.equal(err.error.errorCode.number, 6010);
+//         assert.equal(err.error.errorMessage, "No more redeemables available");
+//         return true;
+//       }
+//     );
+//   });
 
-  it('Updates a redeemable', async () => {
-    [publisherEncryptionPublicKey, publisherKeys] = await encrypt.exportPublicKey();
-    const encryptionPublicKeyBuffer = new Buffer.from(publisherEncryptionPublicKey)
+//   it('Updates a redeemable', async () => {
+//     [publisherEncryptionPublicKey, publisherKeys] = await encrypt.exportPublicKey();
+//     const encryptionPublicKeyBuffer = new Buffer.from(publisherEncryptionPublicKey)
 
-    const [redeemable, redeemableBump] = await anchor.web3.PublicKey.findProgramAddress(
-      [Buffer.from(anchor.utils.bytes.utf8.encode("nina-redeemable")), release.toBuffer(), redeemedMint.publicKey.toBuffer()],
-      nina.programId
-    );    
-    const redeeemableAccount = await nina.account.redeemable.fetch(redeemable)
-    const config = {
-      encryptionPublicKey: encryptionPublicKeyBuffer,
-      description: encrypt.decode(redeeemableAccount.description),
-      redeemedMax: redeeemableAccount.redeemedMax,
-    };
+//     const [redeemable, redeemableBump] = await anchor.web3.PublicKey.findProgramAddress(
+//       [Buffer.from(anchor.utils.bytes.utf8.encode("nina-redeemable")), release.toBuffer(), redeemedMint.publicKey.toBuffer()],
+//       nina.programId
+//     );    
+//     const redeeemableAccount = await nina.account.redeemable.fetch(redeemable)
+//     const config = {
+//       encryptionPublicKey: encryptionPublicKeyBuffer,
+//       description: encrypt.decode(redeeemableAccount.description),
+//       redeemedMax: redeeemableAccount.redeemedMax,
+//     };
 
-    await nina.rpc.redeemableUpdateConfig(
-      config,{
-        accounts: {
-          authority: provider.wallet.publicKey,
-          release,
-          redeemable,
-          redeemableSigner: redeeemableAccount.redeemableSigner,
-          redeemableMint: releaseMint.publicKey,
-          redeemedMint: redeemedMint.publicKey,
-          rent: anchor.web3.SYSVAR_RENT_PUBKEY,
-          systemProgram: anchor.web3.SystemProgram.programId,
-        },
-      }
-    )
+//     await nina.rpc.redeemableUpdateConfig(
+//       config,{
+//         accounts: {
+//           authority: provider.wallet.publicKey,
+//           release,
+//           redeemable,
+//           redeemableSigner: redeeemableAccount.redeemableSigner,
+//           redeemableMint: releaseMint.publicKey,
+//           redeemedMint: redeemedMint.publicKey,
+//           rent: anchor.web3.SYSVAR_RENT_PUBKEY,
+//           systemProgram: anchor.web3.SystemProgram.programId,
+//         },
+//       }
+//     )
 
-    const redeemableAfter = await nina.account.redeemable.fetch(redeemable);
-    let encryptionPublicKeyBefore = Buffer.from(redeeemableAccount.encryptionPublicKey);
-    encryptionPublicKeyBefore = encryptionPublicKeyBefore.buffer.slice(
-      encryptionPublicKeyBefore.byteOffset,
-      encryptionPublicKeyBefore.byteOffset + encryptionPublicKeyBefore.byteLength
-    );
+//     const redeemableAfter = await nina.account.redeemable.fetch(redeemable);
+//     let encryptionPublicKeyBefore = Buffer.from(redeeemableAccount.encryptionPublicKey);
+//     encryptionPublicKeyBefore = encryptionPublicKeyBefore.buffer.slice(
+//       encryptionPublicKeyBefore.byteOffset,
+//       encryptionPublicKeyBefore.byteOffset + encryptionPublicKeyBefore.byteLength
+//     );
 
-    let encryptionPublicKeyAfter = Buffer.from(redeemableAfter.encryptionPublicKey);
-    encryptionPublicKeyAfter = encryptionPublicKeyAfter.buffer.slice(
-      encryptionPublicKeyAfter.byteOffset,
-      encryptionPublicKeyAfter.byteOffset + encryptionPublicKeyAfter.byteLength
-    );
-    assert.ok(encryptionPublicKeyBefore !== encryptionPublicKeyAfter)
-    assert.deepEqual(encryptionPublicKeyAfter, publisherEncryptionPublicKey)
-  });
-});
+//     let encryptionPublicKeyAfter = Buffer.from(redeemableAfter.encryptionPublicKey);
+//     encryptionPublicKeyAfter = encryptionPublicKeyAfter.buffer.slice(
+//       encryptionPublicKeyAfter.byteOffset,
+//       encryptionPublicKeyAfter.byteOffset + encryptionPublicKeyAfter.byteLength
+//     );
+//     assert.ok(encryptionPublicKeyBefore !== encryptionPublicKeyAfter)
+//     assert.deepEqual(encryptionPublicKeyAfter, publisherEncryptionPublicKey)
+//   });
+// });
 
 describe('Vault', async () => {
   it('Withdraws From the Vault to Vault Authority', async () => {

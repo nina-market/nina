@@ -191,6 +191,7 @@ dependencies = [
  "anchor-derive-accounts",
  "anchor-derive-serde",
  "anchor-derive-space",
+ "anchor-syn",
  "arrayref",
  "base64 0.13.1",
  "bincode",
@@ -587,9 +588,9 @@ dependencies = [
 
 [[package]]
 name = "bumpalo"
-version = "3.15.2"
+version = "3.15.4"
 source = "registry+https://github.com/rust-lang/crates.io-index"
-checksum = "a3b1be7772ee4501dba05acbe66bb1e8760f6a6c474a36035631638e4415f130"
+checksum = "7ff69b9dd49fd426c69a0db9fc04dd934cdb6645ff000864d98f7e2af8830eaa"
 
 [[package]]
 name = "bv"
@@ -1242,7 +1243,7 @@ dependencies = [
 
 [[package]]
 name = "nina"
-version = "0.3.0"
+version = "0.3.3"
 dependencies = [
  "anchor-lang",
  "anchor-spl",

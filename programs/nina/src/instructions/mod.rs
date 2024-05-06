@@ -11,11 +11,6 @@ pub mod release_close_edition;
 pub mod release_claim;
 pub mod release_open_to_limited_edition;
 
-pub mod redeemable_init;
-pub mod redeemable_update_config;
-pub mod redeemable_redeem;
-pub mod redeemable_shipping_update;
-
 pub mod exchange_init;
 pub mod exchange_cancel;
 pub mod exchange_cancel_sol;
@@ -52,11 +47,6 @@ pub use release_update_metadata::*;
 pub use release_close_edition::*;
 pub use release_claim::*;
 pub use release_open_to_limited_edition::*;
-
-pub use redeemable_init::*;
-pub use redeemable_update_config::*;
-pub use redeemable_redeem::*;
-pub use redeemable_shipping_update::*;
 
 pub use exchange_init::*;
 pub use exchange_cancel::*;
