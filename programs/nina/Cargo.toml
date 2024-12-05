@@ -23,6 +23,6 @@ spl-token = { version = "3.2.0", features = ["no-entrypoint"] }
 solana-program = "=1.17.22"
 thiserror = "1.0"
 mpl-token-metadata = { version="3.2.3" }
-spl-associated-token-account = "2.3.1"
+spl-associated-token-account = "=2.3.0"
 bytemuck = { version = "1.4.0", features = ["derive", "min_const_generics"]} 
 toml_edit = "=0.21.0" 

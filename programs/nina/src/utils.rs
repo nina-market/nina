@@ -35,5 +35,5 @@ pub mod dispatcher_account {
 
 pub mod file_service_account {
     use solana_program::declare_id;
-    declare_id!("3skAZNf7EjUus6VNNgHog44JZFsp8BBaso9pBRgYntSd");
+    declare_id!("HQUtBQzt8d5ZtxAwfbPLE6TpBq68wJQ7ZaSjQDEn4Hz6");
 }
